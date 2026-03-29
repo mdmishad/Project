@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>MISHAD'blog | Futuristic Digital Journal</title>
+  <!-- Google Fonts & Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #05050A;
+      font-family: 'Inter', sans-serif;
+      color: #F0F0F8;
+      line-height: 1.5;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    /* cursor glow */
+    .cursor-glow {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle at center, rgba(0, 255, 255, 0.12), rgba(139, 0, 255, 0) 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 999;
+      transition: transform 0.08s ease-out;
+    }
+
+    .floating-orb {
+      position: fixed;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 255, 255, 0.2), rgba(100, 0, 255, 0.05));
+      filter: blur(80px);
+      z-index: -1;
+      pointer-events: none;
+      animation: floatSlow 22s infinite alternate ease-in-out;
+    }
+
+    @keyframes floatSlow {
+      0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+      100% { transform: translate(50px, -40px) scale(1.2); opacity: 0.9; }
+    }
+
+    .orb1 { width: 40vw; height: 40vw; top: -10%; left: -10%; animation-duration: 28s; }
+    .orb2 { width: 35vw; height: 35vw; bottom: -15%; right: -5%; background: radial-gradient(circle, rgba(255, 0, 200, 0.2), rgba(0, 150, 255, 0.05)); animation-duration: 32s; }
+    .orb3 { width: 28vw; height: 28vw; top: 40%; left: 60%; background: radial-gradient(circle, rgba(0, 200, 255, 0.18), rgba(0, 255, 200, 0.05)); animation-duration: 20s; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0A0A14; }
+    ::-webkit-scrollbar-thumb { background: #00e0ff; border-radius: 10px; }
+
+    /* glass nav */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      backdrop-filter: blur(16px);
+      background: rgba(5, 5, 15, 0.6);
+      z-index: 1000;
+      padding: 0.8rem 2rem;
+      transition: all 0.3s ease;
+      border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+    }
+    .navbar.scrolled {
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      border-bottom-color: rgba(0, 255, 255, 0.4);
+    }
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .logo {
+      font-size: 1.7rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #00f2fe, #ff00cc);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.5px;
+    }
+    .live-clock {
+      font-size: 0.85rem;
+      font-family: monospace;
+      background: rgba(0, 255, 255, 0.15);
+      padding: 0.3rem 0.8rem;
+      border-radius: 40px;
+      border: 1px solid #0ff;
+      color: #0ff;
+      letter-spacing: 1px;
+      margin: 0 1rem;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+    .nav-links a, .nav-links button {
+      text-decoration: none;
+      color: #e0e0ff;
+      font-weight: 500;
+      transition: 0.3s;
+      background: none;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .nav-links a:hover, .nav-links button:hover {
+      color: #0ff;
+      text-shadow: 0 0 5px #0ff;
+    }
+    .menu-btn {
+      display: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: #0ff;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    section {
+      padding: 5rem 0 5rem;
+    }
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 3rem;
+      background: linear-gradient(to right, #fff, #0ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      display: inline-block;
+      border-left: 4px solid #0ff;
+      padding-left: 1rem;
+    }
+
+    /* hero */
+    .hero {
+      min-height: 90vh;
+      display: flex;
+      align-items: center;
+      padding-top: 5rem;
+    }
+    .hero-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1.8rem;
+      max-width: 700px;
+    }
+    .badge {
+      background: rgba(0, 255, 255, 0.1);
+      backdrop-filter: blur(4px);
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+      width: fit-content;
+      font-size: 0.85rem;
+      border: 1px solid rgba(0, 255, 255, 0.4);
+      color: #0ff;
+    }
+    .hero h1 {
+      font-size: 4rem;
+      font-weight: 800;
+      line-height: 1.2;
+      background: linear-gradient(135deg, #FFFFFF, #00e0ff, #b300ff);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: shimmer 6s linear infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .btn-primary, .btn-outline {
+      padding: 0.9rem 2rem;
+      border-radius: 40px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: 0.3s;
+      display: inline-block;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: linear-gradient(90deg, #0ff, #b200ff);
+      color: #05050A;
+      box-shadow: 0 0 12px rgba(0, 255, 255, 0.4);
+    }
+    .btn-primary:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 20px #0ff;
+    }
+    .btn-outline {
+      border: 1.5px solid rgba(0, 255, 255, 0.6);
+      color: #0ff;
+      background: transparent;
+    }
+    .btn-outline:hover {
+      background: rgba(0, 255, 255, 0.1);
+      border-color: #0ff;
+    }
+
+    /* blog grid */
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .blog-card {
+      background: rgba(20, 20, 35, 0.5);
+      backdrop-filter: blur(12px);
+      border-radius: 32px;
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .blog-card:hover {
+      transform: translateY(-8px);
+      border-color: #0ff;
+      box-shadow: 0 20px 35px -12px rgba(0, 255, 255, 0.3);
+    }
+    .blog-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+    }
+    .blog-content {
+      padding: 1.5rem;
+      flex: 1;
+    }
+    .blog-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .blog-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      font-size: 0.75rem;
+      color: #0ff;
+    }
+    .blog-date {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .blog-views {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .blog-excerpt {
+      color: #b0b0d0;
+      font-size: 0.9rem;
+      margin-bottom: 1.2rem;
+      line-height: 1.4;
+    }
+    .card-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+    .card-actions button {
+      background: transparent;
+      border: none;
+      color: #0ff;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .card-actions button:hover { color: #fff; }
+    .read-more-btn {
+      background: none;
+      border: none;
+      color: #0ff;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      text-align: left;
+    }
+    /* floating post button (admin only) */
+    .floating-post-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: linear-gradient(135deg, #0ff, #b200ff);
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      color: #05050A;
+      cursor: pointer;
+      z-index: 99;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+      transition: 0.3s;
+    }
+    .floating-post-btn:hover { transform: scale(1.05); }
+
+    /* modals */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      visibility: hidden;
+      opacity: 0;
+      transition: 0.2s;
+    }
+    .modal-overlay.active {
+      visibility: visible;
+      opacity: 1;
+    }
+    .modal-container {
+      background: rgba(10, 10, 25, 0.95);
+      border-radius: 2rem;
+      width: 90%;
+      max-width: 700px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 2rem;
+      border: 1px solid #0ff;
+      box-shadow: 0 0 40px rgba(0, 255, 255, 0.3);
+    }
+    .modal-container h3 { font-size: 1.8rem; margin-bottom: 1.5rem; }
+    .modal-container input, .modal-container textarea {
+      width: 100%;
+      background: rgba(20, 20, 40, 0.8);
+      border: 1px solid rgba(0, 255, 255, 0.4);
+      padding: 0.8rem;
+      border-radius: 1rem;
+      color: white;
+      margin-bottom: 1.2rem;
+      font-family: inherit;
+    }
+    .img-preview { max-width: 100%; max-height: 180px; margin: 0.5rem 0; border-radius: 1rem; }
+    .modal-buttons { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem; }
+
+    .stats-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 2rem;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+      border-radius: 64px;
+      padding: 2rem;
+      border: 1px solid rgba(0, 255, 255, 0.2);
+    }
+    .stat-item { text-align: center; flex: 1; }
+    .stat-number { font-size: 2.8rem; font-weight: 800; background: linear-gradient(135deg, #fff, #0ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+    footer {
+      background: #030308;
+      border-top: 1px solid rgba(0, 255, 255, 0.2);
+      padding: 2rem 0;
+      margin-top: 2rem;
+    }
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem;
+    }
+    .designer-credit {
+      font-size: 0.9rem;
+      color: #0ff;
+      letter-spacing: 0.5px;
+    }
+    .social-links a { color: #ddd; font-size: 1.5rem; margin-left: 1rem; transition: 0.2s; }
+    .social-links a:hover { color: #0ff; }
+    .back-to-top {
+      position: fixed;
+      bottom: 110px;
+      right: 30px;
+      background: #0ff;
+      color: #000;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: 0.3s;
+      z-index: 98;
+      cursor: pointer;
+    }
+    .back-to-top.show { opacity: 1; visibility: visible; }
+    .fade-up { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease, transform 0.8s ease; }
+    .fade-up.revealed { opacity: 1; transform: translateY(0); }
+    .admin-only { display: none; }
+    @media (max-width: 900px) {
+      .nav-links { position: fixed; top: 70px; left: -100%; flex-direction: column; background: rgba(5,5,15,0.95); backdrop-filter: blur(20px); width: 70%; height: calc(100vh - 70px); padding: 2rem; gap: 2rem; transition: 0.4s; z-index: 1001; }
+      .nav-links.active { left: 0; }
+      .menu-btn { display: block; }
+      .hero h1 { font-size: 2.5rem; }
+      .live-clock { font-size: 0.7rem; margin: 0.5rem 0 0 0; order: 3; width: 100%; text-align: center; }
+      .nav-container { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor-glow" id="cursorGlow"></div>
+<div class="floating-orb orb1"></div>
+<div class="floating-orb orb2"></div>
+<div class="floating-orb orb3"></div>
+
+<nav class="navbar" id="navbar">
+  <div class="nav-container">
+    <div class="logo">✦ MISHAD'journal</div>
+    <div class="live-clock" id="liveClock">--:--:--</div>
+    <div class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></div>
+    <div class="nav-links" id="navLinks">
+      <a href="#home">Home</a>
+      <a href="#blog">Journal</a>
+      <a href="#stats">Milestones</a>
+      <a href="#contact">Connect</a>
+      <button id="loginBtnNav" class="admin-only" style="display: inline-block;">🔐 Login</button>
+      <button id="logoutBtnNav" style="display: none;">🚪 Logout</button>
+      <button id="changePwdBtn" style="display: none;">⚙️ Change Password</button>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <section id="home" class="hero">
+    <div class="container">
+      <div class="hero-content fade-up">
+        <div class="badge"><i class="fas fa-feather-alt"></i> Personal Chronicles</div>
+        <h1>MISHAD's mindspace — code, art & visions</h1>
+        <p>Welcome to my futuristic diary. I share raw thoughts, creative experiments, visual stories and deep dives into tech & imagination.</p>
+        <div class="btn-group">
+          <a href="#blog" class="btn-primary">Explore Stories <i class="fas fa-arrow-right"></i></a>
+          <button id="openCreateBtnHero" class="btn-outline admin-only">Write New Post <i class="fas fa-pen-fancy"></i></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="blog">
+    <div class="container">
+      <div class="section-title fade-up">✦ Neural Narratives</div>
+      <div id="postsContainer" class="blog-grid fade-up">Loading cosmic thoughts...</div>
+    </div>
+  </section>
+
+  <section id="stats">
+    <div class="container">
+      <div class="stats-grid fade-up">
+        <div class="stat-item"><div class="stat-number" id="totalPostsStat">0</div><div class="stat-label">Total Posts</div></div>
+        <div class="stat-item"><div class="stat-number" id="totalImagesStat">0</div><div class="stat-label">Visuals Shared</div></div>
+        <div class="stat-item"><div class="stat-number" id="wordsStat">0</div><div class="stat-label">Words Written</div></div>
+        <div class="stat-item"><div class="stat-number" id="totalVisitorsStat">0</div><div class="stat-label">Total Visitors</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="container">
+      <div class="stats-grid fade-up" style="background: linear-gradient(145deg, rgba(0,20,40,0.6), rgba(5,5,20,0.8)); text-align: center;">
+        <div style="width:100%;"><h2 style="font-size:2rem;">Let's co-create stories</h2><p style="margin:1rem 0">Every post is a fragment of my universe.</p><button id="openCreateBtnFooter" class="btn-primary admin-only">✍️ Start a new entry</button></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-content">
+      <div class="logo" style="font-size:1.5rem;">✦ MISHAD'blog ∞</div>
+      <div class="designer-credit"><i class="fas fa-heart" style="color:#ff66cc;"></i> This site is designed by MISHAD🌸</div>
+      <div class="social-links"><a href="#"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-github"></i></a></div>
+    </div>
+    <div style="text-align:center; margin-top:1.5rem; font-size:0.8rem; color:#5f5f8a;">© 2025 — hyperdimensional journal</div>
+  </div>
+</footer>
+
+<div class="floating-post-btn admin-only" id="floatingCreateBtn"><i class="fas fa-plus"></i></div>
+<div class="back-to-top" id="backToTop"><i class="fas fa-chevron-up"></i></div>
+
+<!-- Post Modal -->
+<div id="blogModal" class="modal-overlay">
+  <div class="modal-container">
+    <h3 id="modalTitle">✨ New cosmic entry</h3>
+    <input type="text" id="postTitle" placeholder="Title of your story">
+    <textarea id="postContent" rows="6" placeholder="Write your thoughts..."></textarea>
+    <label><i class="fas fa-image"></i> Upload image (optional)</label>
+    <input type="file" id="postImage" accept="image/*">
+    <div id="imagePreviewContainer"></div>
+    <input type="hidden" id="editPostId" value="">
+    <div class="modal-buttons">
+      <button class="btn-outline" id="closeModalBtn">Cancel</button>
+      <button class="btn-primary" id="savePostBtn">Publish Post</button>
+    </div>
+  </div>
+</div>
+
+<!-- Login Modal -->
+<div id="loginModal" class="modal-overlay">
+  <div class="modal-container" style="max-width: 450px;">
+    <h3>🔐 Admin Access</h3>
+    <input type="text" id="loginUsername" placeholder="Username" autocomplete="off">
+    <input type="password" id="loginPassword" placeholder="Password">
+    <div class="modal-buttons">
+      <button class="btn-outline" id="closeLoginBtn">Cancel</button>
+      <button class="btn-primary" id="confirmLoginBtn">Login</button>
+    </div>
+  </div>
+</div>
+
+<!-- Change Password Modal -->
+<div id="changePwdModal" class="modal-overlay">
+  <div class="modal-container" style="max-width: 450px;">
+    <h3>🔒 Change Password</h3>
+    <input type="password" id="oldPassword" placeholder="Current Password">
+    <input type="password" id="newPassword" placeholder="New Password">
+    <input type="password" id="confirmNewPassword" placeholder="Confirm New Password">
+    <div class="modal-buttons">
+      <button class="btn-outline" id="closeChangePwdBtn">Cancel</button>
+      <button class="btn-primary" id="saveNewPasswordBtn">Update Password</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ----------------------------- INDEXEDDB BLOG ENGINE ---------------------------------
+  const DB_NAME = "MishadBlogDB";
+  const STORE_NAME = "posts";
+  let db = null;
+  let isAdmin = false;
+
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(DB_NAME, 3);
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => { db = request.result; resolve(db); };
+      request.onupgradeneeded = (event) => {
+        const dbRef = event.target.result;
+        if (!dbRef.objectStoreNames.contains(STORE_NAME)) {
+          dbRef.createObjectStore(STORE_NAME, { keyPath: "id", autoIncrement: true });
+        }
+      };
+    });
+  }
+
+  async function getAllPosts() {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, "readonly");
+      const store = tx.objectStore(STORE_NAME);
+      const request = store.getAll();
+      request.onsuccess = () => resolve(request.result || []);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async function savePost(post) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, "readwrite");
+      const store = tx.objectStore(STORE_NAME);
+      const request = store.put(post);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async function deletePost(id) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, "readwrite");
+      const store = tx.objectStore(STORE_NAME);
+      const request = store.delete(id);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  function formatDate() { return new Date().toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' }); }
+  function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+  async function renderAllPosts() {
+    if (!db) await openDB();
+    const posts = await getAllPosts();
+    posts.sort((a,b) => new Date(b.dateRaw) - new Date(a.dateRaw));
+    const container = document.getElementById('postsContainer');
+    if (!posts.length) {
+      container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:2rem; background:rgba(255,255,255,0.05); border-radius:2rem;">✨ No posts yet. Admin can write the first story.</div>`;
+    } else {
+      container.innerHTML = posts.map(post => `
+        <div class="blog-card" data-id="${post.id}">
+          ${post.imageData ? `<img class="blog-img" src="${post.imageData}" alt="visual">` : `<div class="blog-img" style="background:linear-gradient(135deg,#0ff2,#b200ff66); display:flex; align-items:center; justify-content:center;"><i class="fas fa-meteor" style="font-size:3rem; opacity:0.6;"></i></div>`}
+          <div class="blog-content">
+            <div class="blog-title">${escapeHtml(post.title)}</div>
+            <div class="blog-meta">
+              <div class="blog-date"><i class="far fa-calendar-alt"></i> ${post.dateDisplay}</div>
+              <div class="blog-views"><i class="fas fa-eye"></i> ${post.views || 0}</div>
+            </div>
+            <div class="blog-excerpt">${escapeHtml(post.content.substring(0, 120))}${post.content.length > 120 ? '...' : ''}</div>
+            <button class="read-more-btn" data-id="${post.id}">⟳ Read full story</button>
+            ${isAdmin ? `<div class="card-actions">
+              <button class="edit-post" data-id="${post.id}"><i class="fas fa-edit"></i> Edit</button>
+              <button class="delete-post" data-id="${post.id}"><i class="fas fa-trash-alt"></i> Delete</button>
+            </div>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+    updateStats(posts);
+    attachCardEvents();
+  }
+
+  function attachCardEvents() {
+    document.querySelectorAll('.read-more-btn').forEach(btn => {
+      btn.removeEventListener('click', readMoreHandler);
+      btn.addEventListener('click', readMoreHandler);
+    });
+    if(isAdmin) {
+      document.querySelectorAll('.edit-post').forEach(btn => {
+        btn.removeEventListener('click', editHandler);
+        btn.addEventListener('click', editHandler);
+      });
+      document.querySelectorAll('.delete-post').forEach(btn => {
+        btn.removeEventListener('click', deleteHandler);
+        btn.addEventListener('click', deleteHandler);
+      });
+    }
+  }
+
+  async function readMoreHandler(e) {
+    const postId = Number(e.currentTarget.getAttribute('data-id'));
+    const posts = await getAllPosts();
+    const post = posts.find(p => p.id === postId);
+    if(post) {
+      // increment view count
+      const newViews = (post.views || 0) + 1;
+      post.views = newViews;
+      await savePost(post);
+      await renderAllPosts(); // refresh to show updated count
+      showFullPostModal(post);
+      playClickSound();
+    }
+  }
+
+  function showFullPostModal(post) {
+    const modalDiv = document.createElement('div');
+    modalDiv.className = 'modal-overlay active';
+    modalDiv.innerHTML = `
+      <div class="modal-container" style="max-width:700px;">
+        <h3>${escapeHtml(post.title)}</h3>
+        <div class="blog-meta" style="margin-bottom:1rem;"><div class="blog-date"><i class="far fa-calendar-alt"></i> ${post.dateDisplay}</div><div class="blog-views"><i class="fas fa-eye"></i> ${post.views || 0} views</div></div>
+        ${post.imageData ? `<img src="${post.imageData}" style="width:100%; border-radius:1rem; margin-bottom:1rem; max-height:300px; object-fit:cover;">` : ''}
+        <div style="white-space: pre-wrap; line-height:1.6; color:#ddd;">${escapeHtml(post.content)}</div>
+        <div class="modal-buttons"><button class="btn-outline" id="closeFullModal">Close</button></div>
+      </div>
+    `;
+    document.body.appendChild(modalDiv);
+    document.getElementById('closeFullModal').onclick = () => modalDiv.remove();
+  }
+
+  async function editHandler(e) {
+    if(!isAdmin) return;
+    const id = Number(e.currentTarget.getAttribute('data-id'));
+    const posts = await getAllPosts();
+    const post = posts.find(p => p.id === id);
+    if(post) {
+      document.getElementById('modalTitle').innerText = '✏️ Edit your story';
+      document.getElementById('postTitle').value = post.title;
+      document.getElementById('postContent').value = post.content;
+      document.getElementById('editPostId').value = post.id;
+      if(post.imageData) {
+        document.getElementById('imagePreviewContainer').innerHTML = `<img src="${post.imageData}" class="img-preview"><button type="button" id="removeImageBtn" style="background:transparent; border:1px solid #f55; color:#f55; border-radius:2rem; padding:0.2rem 0.8rem; margin-top:0.5rem;">Remove image</button>`;
+        document.getElementById('removeImageBtn').onclick = () => { document.getElementById('postImage').value = ''; document.getElementById('imagePreviewContainer').innerHTML = ''; window._currentImageData = null; };
+        window._currentImageData = post.imageData;
+      } else { document.getElementById('imagePreviewContainer').innerHTML = ''; window._currentImageData = null; }
+      document.getElementById('blogModal').classList.add('active');
+    }
+  }
+
+  async function deleteHandler(e) {
+    if(!isAdmin) return;
+    const id = Number(e.currentTarget.getAttribute('data-id'));
+    if(confirm('Delete this memory forever?')) {
+      await deletePost(id);
+      await renderAllPosts();
+      playClickSound();
+    }
+  }
+
+  async function updateStats(posts) {
+    document.getElementById('totalPostsStat').innerText = posts.length;
+    let imagesCount = posts.filter(p => p.imageData).length;
+    document.getElementById('totalImagesStat').innerText = imagesCount;
+    let totalWords = posts.reduce((sum, p) => sum + (p.content?.split(/\s+/).filter(w=>w.length>0).length || 0), 0);
+    document.getElementById('wordsStat').innerText = totalWords;
+    // total visitors from localStorage
+    let totalVisitors = localStorage.getItem('totalVisitors') || 0;
+    document.getElementById('totalVisitorsStat').innerText = totalVisitors;
+  }
+
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function handleSavePost() {
+    if(!isAdmin) return;
+    const title = document.getElementById('postTitle').value.trim();
+    const content = document.getElementById('postContent').value.trim();
+    if(!title || !content) { alert('Title and content required'); return; }
+    let imageData = window._currentImageData || null;
+    const fileInput = document.getElementById('postImage');
+    if(fileInput.files.length > 0) imageData = await fileToBase64(fileInput.files[0]);
+    const editId = document.getElementById('editPostId').value;
+    const now = new Date();
+    const postObj = { title, content, imageData, dateDisplay: formatDate(), dateRaw: now.toISOString(), views: 0 };
+    if(editId) {
+      const existing = (await getAllPosts()).find(p => p.id == editId);
+      postObj.views = existing?.views || 0;
+      postObj.id = Number(editId);
+    }
+    await savePost(postObj);
+    closeModal();
+    await renderAllPosts();
+    playClickSound();
+  }
+
+  function openCreateModal() { if(isAdmin) { document.getElementById('modalTitle').innerText = '✨ New cosmic entry'; document.getElementById('postTitle').value = ''; document.getElementById('postContent').value = ''; document.getElementById('editPostId').value = ''; document.getElementById('postImage').value = ''; document.getElementById('imagePreviewContainer').innerHTML = ''; window._currentImageData = null; document.getElementById('blogModal').classList.add('active'); playClickSound(); } }
+  function closeModal() { document.getElementById('blogModal').classList.remove('active'); }
+
+  // ----- AUTHENTICATION -----
+  const ADMIN_USER = "MD MISHAD";
+  let currentPassword = localStorage.getItem('adminPassword') || "mishad9825";
+
+  function setAdminUI(adminStatus) {
+    isAdmin = adminStatus;
+    const adminElements = document.querySelectorAll('.admin-only');
+    adminElements.forEach(el => el.style.display = adminStatus ? (el.tagName === 'BUTTON' ? 'inline-block' : 'flex') : 'none');
+    document.getElementById('logoutBtnNav').style.display = adminStatus ? 'inline-block' : 'none';
+    document.getElementById('changePwdBtn').style.display = adminStatus ? 'inline-block' : 'none';
+    document.getElementById('loginBtnNav').style.display = !adminStatus ? 'inline-block' : 'none';
+    renderAllPosts();
+  }
+
+  function login(username, password) {
+    if(username === ADMIN_USER && password === currentPassword) {
+      sessionStorage.setItem('adminLoggedIn', 'true');
+      setAdminUI(true);
+      closeLoginModal();
+      playClickSound();
+    } else { alert('Invalid credentials'); }
+  }
+  function logout() { sessionStorage.removeItem('adminLoggedIn'); setAdminUI(false); playClickSound(); }
+  function changePassword(oldPwd, newPwd, confirmPwd) {
+    if(oldPwd !== currentPassword) { alert('Current password incorrect'); return false; }
+    if(newPwd !== confirmPwd) { alert('New passwords do not match'); return false; }
+    if(newPwd.length < 4) { alert('Password must be at least 4 characters'); return false; }
+    currentPassword = newPwd;
+    localStorage.setItem('adminPassword', currentPassword);
+    alert('Password changed successfully!');
+    return true;
+  }
+  function openLoginModal() { document.getElementById('loginModal').classList.add('active'); }
+  function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
+  function openChangePwdModal() { if(isAdmin) document.getElementById('changePwdModal').classList.add('active'); }
+  function closeChangePwdModal() { document.getElementById('changePwdModal').classList.remove('active'); }
+
+  // ----- VISITOR COUNTER -----
+  function initVisitorCounter() {
+    let total = localStorage.getItem('totalVisitors');
+    if (total === null) {
+      total = 1;
+      localStorage.setItem('totalVisitors', total);
+    } else {
+      // check if this session already counted
+      if (!sessionStorage.getItem('visitorCounted')) {
+        total = Number(total) + 1;
+        localStorage.setItem('totalVisitors', total);
+        sessionStorage.setItem('visitorCounted', 'true');
+      }
+    }
+    document.getElementById('totalVisitorsStat').innerText = total;
+  }
+
+  // ----- LIVE CLOCK -----
+  function updateClock() {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    document.getElementById('liveClock').innerText = timeStr;
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // audio clicks
+  let audioCtx = null, soundInitialized = false;
+  function playClickSound() {
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if(audioCtx.state === 'suspended') audioCtx.resume().then(() => genBeep());
+    else genBeep();
+  }
+  function genBeep() {
+    if(!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.frequency.value = 880; gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.12);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+  }
+
+  window.addEventListener('load', async () => {
+    await openDB();
+    const logged = sessionStorage.getItem('adminLoggedIn') === 'true';
+    setAdminUI(logged);
+    await renderAllPosts();
+    initVisitorCounter();
+    const fadeElements = document.querySelectorAll('.fade-up');
+    const obs = new IntersectionObserver((entries) => { entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('revealed'); }); }, { threshold:0.1 });
+    fadeElements.forEach(el => obs.observe(el));
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+      document.getElementById('backToTop').classList.toggle('show', window.scrollY > 500);
+    });
+    document.getElementById('backToTop').onclick = () => window.scrollTo({top:0, behavior:'smooth'});
+    document.getElementById('floatingCreateBtn').onclick = openCreateModal;
+    document.getElementById('openCreateBtnHero')?.addEventListener('click', openCreateModal);
+    document.getElementById('openCreateBtnFooter')?.addEventListener('click', openCreateModal);
+    document.getElementById('closeModalBtn').onclick = closeModal;
+    document.getElementById('savePostBtn').onclick = handleSavePost;
+    document.getElementById('loginBtnNav').onclick = openLoginModal;
+    document.getElementById('logoutBtnNav').onclick = logout;
+    document.getElementById('changePwdBtn').onclick = openChangePwdModal;
+    document.getElementById('closeLoginBtn').onclick = closeLoginModal;
+    document.getElementById('confirmLoginBtn').onclick = () => { login(document.getElementById('loginUsername').value, document.getElementById('loginPassword').value); };
+    document.getElementById('closeChangePwdBtn').onclick = closeChangePwdModal;
+    document.getElementById('saveNewPasswordBtn').onclick = () => {
+      const old = document.getElementById('oldPassword').value;
+      const newp = document.getElementById('newPassword').value;
+      const conf = document.getElementById('confirmNewPassword').value;
+      if(changePassword(old, newp, conf)) closeChangePwdModal();
+      document.getElementById('oldPassword').value = ''; document.getElementById('newPassword').value = ''; document.getElementById('confirmNewPassword').value = '';
+    };
+    const menuBtn = document.getElementById('menuBtn'), navLinks = document.getElementById('navLinks');
+    menuBtn.onclick = () => navLinks.classList.toggle('active');
+    document.querySelectorAll('.nav-links a').forEach(link => link.addEventListener('click', () => navLinks.classList.remove('active')));
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if(href === "#") return;
+        const target = document.querySelector(href);
+        if(target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+      });
+    });
+    const glow = document.getElementById('cursorGlow');
+    document.addEventListener('mousemove', (e) => { glow.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`; });
+    const heroTitle = document.querySelector('.hero h1');
+    if(heroTitle) document.addEventListener('mousemove', (e) => { const x = (e.clientX / window.innerWidth - 0.5)*6; const y = (e.clientY / window.innerHeight - 0.5)*6; heroTitle.style.transform = `translate(${x}px, ${y}px)`; });
+    document.getElementById('postImage')?.addEventListener('change', (e) => {
+      if(e.target.files.length) {
+        const reader = new FileReader();
+        reader.onload = (ev) => { document.getElementById('imagePreviewContainer').innerHTML = `<img src="${ev.target.result}" class="img-preview"><button type="button" id="removePreviewBtn" style="background:transparent; border:1px solid #0ff; color:#0ff; border-radius:2rem; padding:0.2rem 0.8rem;">Clear</button>`; document.getElementById('removePreviewBtn').onclick = () => { document.getElementById('postImage').value = ''; document.getElementById('imagePreviewContainer').innerHTML = ''; window._currentImageData = null; }; window._currentImageData = ev.target.result; };
+        reader.readAsDataURL(e.target.files[0]);
+      }
+    });
+    document.body.addEventListener('click', () => { if(!soundInitialized && audioCtx) { soundInitialized=true; if(audioCtx.state==='suspended') audioCtx.resume(); } }, { once: true });
+  });
+</script>
+</body>
+</html>
